@@ -30,7 +30,7 @@ export const loginUser = createAsyncThunk<
 >("auth/loginUser", async ({ pin }, thunkAPI) => {
   try {
     const response = await axios.post<LoginResponse>(
-      `${import.meta.env.VITE_API_BASE_URL}/api/pin/verify`,
+      `${import.meta.env.VITE_API_BASE_URL}api/pin/verify`,
       { pin },
       { withCredentials: true }
     );
