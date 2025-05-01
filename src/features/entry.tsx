@@ -6,7 +6,7 @@ type JournalEntry = {
     date: Date
     content: string
 }
-
+//
 interface EntryState {
     loading: boolean;
     error: string | null;
