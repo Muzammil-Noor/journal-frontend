@@ -31,7 +31,7 @@ export const createEntry = createAsyncThunk(
     
         try {
             const response = await axios.post(
-                `${import.meta.env.VITE_API_BASE_URL}api/entry`,
+                `${import.meta.env.VITE_API_BASE_URL}/api/entry`,
                 payload,
                 {
                     headers: {
@@ -50,7 +50,7 @@ export const createEntry = createAsyncThunk(
 
 export const fetchEntries= createAsyncThunk("faculty/getFaculty", async (token: string, { rejectWithValue }) => {
     try {
-      const response = await axios.get<JournalEntry[]>(`${import.meta.env.VITE_API_BASE_URL}api/entry`, {
+      const response = await axios.get<JournalEntry[]>(`${import.meta.env.VITE_API_BASE_URL}/api/entry`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       return response.data
