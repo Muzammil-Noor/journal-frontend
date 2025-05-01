@@ -14,12 +14,13 @@ export default function PinEntry() {
   const [displayError, setError] = useState<string>("")
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { error, isLoggedin} = useAppSelector((state) => state.auth);
+  const { isLoggedin} = useAppSelector((state) => state.auth);
   useEffect(() => {
     if (isLoggedin) {
       navigate('/');
     }
   }, [isLoggedin, navigate]);
+  
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (/^\d$/.test(e.key)) {
@@ -95,9 +96,9 @@ export default function PinEntry() {
             </Button>
           </div>
         </div>
-        {error &&(
+        {displayError &&(
           <div className="flex justify-center">
-            <p className="text-red-700">{error}</p>
+            <p className="text-red-700">{displayError}</p>
           </div>
         )}
 

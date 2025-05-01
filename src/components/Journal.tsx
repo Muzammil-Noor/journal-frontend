@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type FormEvent, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { Plus, BookOpen, ChevronLeft, ChevronRight } from "lucide-react"
 import { AppDispatch } from "@/store";
 import type { RootState } from "@/store"
@@ -21,11 +21,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {createEntry, fetchEntries} from "@/features/entry"
 
-type JournalEntry = {
-  id: number
-  date: string
-  content: string
-}
 
 export default function JournalLayout() {
   const [currentView, setCurrentView] = useState<"new" | "index" | "entry">("new")
@@ -137,7 +132,7 @@ export default function JournalLayout() {
             <div className="mt-6 px-3">
               <h3 className="text-sm font-medium mb-2">Recent Entries</h3>
               <SidebarMenu>
-                {sortedEntries.map((entry, index) => (
+                {sortedEntries.map((entry) => (
                   <SidebarMenuItem key={entry.id}>
                     <SidebarMenuButton onClick={() => handleEntryView(entry.id)} isActive={currentEntryId === entry.id}>
                       <span>{entry.date.toDateString()}</span>
