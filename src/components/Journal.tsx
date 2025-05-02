@@ -180,7 +180,7 @@ export default function JournalLayout() {
                           onClick={() => handleEntryView(entry.id)}
                         >
                           <div className="flex flex-col">
-                            <span className="text-sm text-muted-foreground">Entry # {index+1}</span>
+                            <span className="text-sm text-muted-foreground">Entry # {sortedEntries.length - index}</span>
                           </div>
                           
                         </Button>
@@ -217,7 +217,7 @@ export default function JournalLayout() {
                     {sortedEntries.findIndex((e) => e.id === currentEntryId) !== -1 && (
                       <>
                         <div className="flex justify-center text-6xl font-bold underline">
-                          Entry # {currentCarouselIndex + 1}
+                          Entry # {sortedEntries.length - currentCarouselIndex}
                         </div>
                         <div className="flex justify-between items-center mb-4">
                           <h2 className="text-2xl font-bold">
