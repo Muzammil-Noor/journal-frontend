@@ -200,7 +200,7 @@ export default function JournalLayout() {
             {/* Index View */}
             {currentView === "index" && (
               <div className="h-full flex flex-col">
-                <h2 className="text-2xl font-serif font-bold mb-6">Journal Index</h2>
+                <h2 className="text-2xl font-bold mb-6">Journal Index</h2>
                 <div className="flex-1">
                   <div className="flex flex-col gap-3">
                     {sortedEntries
@@ -213,10 +213,10 @@ export default function JournalLayout() {
                         >
                           <div className="flex justify-between items-center">
                             <div className="flex flex-col">
-                              <span className="text-sm text-muted-foreground">
+                              <span className="font-medium">
                                 Entry #{sortedEntries.length - index}
                               </span>
-                              <span className="font-medium">{format(entry.date, "MMMM d, yyyy")}</span>
+                              <span className="text-sm text-muted-foreground">{format(entry.date, "MMMM d, yyyy")}</span>
                             </div>
                             <ChevronRight className="h-4 w-4 text-muted-foreground" />
                           </div>
@@ -253,7 +253,7 @@ export default function JournalLayout() {
                 {sortedEntries.findIndex((e) => e.id === currentEntryId) !== -1 && (
                   <>
                     <div className="text-center mb-8">
-                      <div className="text-4xl font-serif font-bold mb-1">
+                      <div className="text-4xl font-bold mb-1">
                         Entry #{sortedEntries.length - currentCarouselIndex}
                       </div>
                       <div className="text-xl font-medium text-gray-700">
