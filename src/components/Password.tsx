@@ -14,12 +14,17 @@ export default function PinEntry() {
   const [displayError, setError] = useState<string>("")
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { isLoggedin} = useAppSelector((state) => state.auth);
+  const { isLoggedin, pinError} = useAppSelector((state) => state.auth);
   useEffect(() => {
     if (isLoggedin) {
       navigate('/');
     }
   }, [isLoggedin, navigate]);
+  useEffect(() => {
+    if (pinError) {
+      setError(pinError)
+    }
+  }, [pinError]);
   
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -57,7 +62,8 @@ export default function PinEntry() {
         setPin("")
       }
       catch(error:any){
-        setError(error)
+        console.log(pinError)
+        setError(pinError)
       }
     } else {
       setError("Please enter a 6-digit PIN")
@@ -79,7 +85,7 @@ export default function PinEntry() {
                 .map((_, index) => (
                   <div
                     key={index}
-                    className="w-10 h-12 border-2 text-gray-300 border-gray-600 rounded-md flex items-center justify-center text-xl font-bold"
+                    className="w-10 h-12 border-2 text-gray-300 border-gray-400 rounded-md flex items-center justify-center text-xl font-bold"
                   >
                     {pin[index] !== undefined ? (showPin ? pin[index] : "•") : null}
                   </div>
@@ -92,7 +98,7 @@ export default function PinEntry() {
               onClick={togglePinVisibility}
               aria-label={showPin ? "Hide PIN" : "Show PIN"}
             >
-              {showPin ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              {showPin ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
             </Button>
           </div>
         </div>
@@ -106,7 +112,7 @@ export default function PinEntry() {
           {[7,8,9,4,5,6,1,2,3,0].map((number) => (
             <Button
               key={number}
-              className="h-14 text-xl font-medium text-gray-400 bg-black border border-gray-500 hover:bg-transparent hover:border-blue-700 hover:text-blue-500 hover:font-black"
+              className="h-14 text-xl font-medium text-gray-200 bg-black border border-gray-400 hover:bg-transparent hover:border-blue-700 hover:text-blue-500 hover:font-black"
               onClick={() => handleNumberClick(number)}
             >
               {number}

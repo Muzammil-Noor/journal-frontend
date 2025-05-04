@@ -11,7 +11,6 @@ interface PrivateRouteProps {
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const navigate = useNavigate();
   const token = isAuthenticated();
-  console.log(import.meta.env.VITE_API_BASE_URL)
 
   useEffect(() => {
     const checkAuth = () => {

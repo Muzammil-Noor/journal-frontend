@@ -5,28 +5,28 @@ interface LoginResponse {
     token: string;
 }
 
-interface ErrorResponse {
+interface pinErrorResponse {
     message: string;
 }
 
 interface AuthState {
     token: string | null;
     isLoading: boolean;
-    error: string | null;
+    pinError: string
     isLoggedin: boolean;
 }
 
 const initialState: AuthState = {
     token: null,
     isLoading: false,
-    error: null,
+    pinError: "",
     isLoggedin: false,
 };
 
 export const loginUser = createAsyncThunk<
   LoginResponse,
   { pin:string },
-  { rejectValue: ErrorResponse }
+  { rejectValue: pinErrorResponse }
 >("auth/loginUser", async ({ pin }, thunkAPI) => {
   try {
     const response = await axios.post<LoginResponse>(
@@ -35,9 +35,9 @@ export const loginUser = createAsyncThunk<
       { withCredentials: true }
     );
     return response.data;
-  } catch (error: any) {
+  } catch (pinError: any) {
     return thunkAPI.rejectWithValue({
-      message: error.response?.data?.message || "Pin Verification Failed",
+      message: pinError.response?.data?.message || "Pin Verification Failed",
     });
   }
 });
@@ -56,7 +56,7 @@ const authSlice = createSlice({
       builder
         .addCase(loginUser.pending, (state) => {
           state.isLoading = true;
-          state.error = null;
+          state.pinError = "";
           state.isLoggedin = false;
         })
         .addCase(
@@ -70,10 +70,10 @@ const authSlice = createSlice({
         )
         .addCase(
           loginUser.rejected,
-          (state, action: PayloadAction<ErrorResponse | undefined>) => {
+          (state, action: PayloadAction<pinErrorResponse | undefined>) => {
             state.isLoading = false;
             state.isLoggedin = false;
-            state.error = action.payload?.message || "Login failed";
+            state.pinError = action.payload?.message || "Login failed";
           }
         );
     },

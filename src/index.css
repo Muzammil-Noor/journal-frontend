@@ -3,7 +3,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
+body{
+  background-color: rgb(65, 65, 65);
+}
 
 :root {
   --radius: 0.625rem;

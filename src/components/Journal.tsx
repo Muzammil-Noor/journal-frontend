@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Plus, BookOpen, ChevronLeft, ChevronRight } from "lucide-react"
-import { AppDispatch } from "@/store";
+import { useState, useEffect, useRef } from "react"
+import { Plus, BookOpen, ChevronLeft, ChevronRight, Menu } from "lucide-react"
+import type { AppDispatch } from "@/store"
 import type { RootState } from "@/store"
 import { useDispatch, useSelector } from "react-redux"
 import { format } from "date-fns"
@@ -14,13 +14,28 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import {createEntry, fetchEntries} from "@/features/entry"
+import { createEntry, fetchEntries } from "@/features/entry"
 
+// Custom sidebar trigger that works when sidebar is collapsed
+const CustomSidebarTrigger = () => {
+  const { toggleSidebar } = useSidebar()
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleSidebar}
+      className="fixed top-4 left-4 z-50 bg-black text-white border-3 border-white backdrop-blur-sm shadow-sm"
+    >
+      <Menu className="h-5 w-5" />
+      <span className="sr-only">Toggle Sidebar</span>
+    </Button>
+  )
+}
 
 export default function JournalLayout() {
   const [currentView, setCurrentView] = useState<"new" | "index" | "entry">("new")
@@ -28,17 +43,18 @@ export default function JournalLayout() {
   const [newEntryContent, setNewEntryContent] = useState("")
   const [currentPage, setCurrentPage] = useState(0)
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0)
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>()
   const entries = useSelector((state: RootState) => state.entry.entries)
   const entriesPerPage = 20
   const totalPages = Math.ceil(entries.length / entriesPerPage)
+  const entryPageRef = useRef<HTMLDivElement>(null)
 
   const sortedEntries = [...entries]
-  .map((entry) => ({
-    ...entry,
-    date: new Date(entry.date),  // Parse the date string to a Date object
-  }))
-  .sort((a, b) => b.date.getTime() - a.date.getTime());
+    .map((entry) => ({
+      ...entry,
+      date: new Date(entry.date),
+    }))
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -58,24 +74,23 @@ export default function JournalLayout() {
   }
 
   const handleEntryView = (id: number) => {
-    setCurrentView("entry");
-    setCurrentEntryId(id);
-    const entryIndex = sortedEntries.findIndex((entry) => entry.id === id);
-    setCurrentCarouselIndex(entryIndex);
+    setCurrentView("entry")
+    setCurrentEntryId(id)
+    const entryIndex = sortedEntries.findIndex((entry) => entry.id === id)
+    setCurrentCarouselIndex(entryIndex)
   }
 
   const handleSaveNewEntry = async () => {
     if (newEntryContent.trim()) {
-      try{
+      try {
         await dispatch(
           createEntry({
-            newEntryContent
-          })
-        ).unwrap();
+            newEntryContent,
+          }),
+        ).unwrap()
         setNewEntryContent("")
-      }
-      catch(error: any){
-
+      } catch (error: any) {
+        // Handle error
       }
     }
   }
@@ -107,11 +122,13 @@ export default function JournalLayout() {
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex h-screen">
-        <Sidebar className="w-[10%] min-w-[200px]">
-          <SidebarHeader className="p-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold">Journal</h2>
+    <div>
+      <div className="absolute z-2">
+      <SidebarProvider>
+      <div className="flex min-h-screen bg-stone-100">
+        <Sidebar variant="floating" collapsible="offcanvas" className="z-50 bg-gray-700">
+          <SidebarHeader className="p-4 pt-3 flex items-center justify-between">
+            <h2 className="text-lg font-bold">Chaotic's Journal</h2>
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
@@ -144,56 +161,76 @@ export default function JournalLayout() {
           </SidebarContent>
         </Sidebar>
 
-        <main className="flex-1 p-6 overflow-hidden ml-5">
-          <div className="h-full w-dvh">
+        {/* Custom sidebar trigger when sidebar is collapsed */}
+        <CustomSidebarTrigger />
+      </div>
+    </SidebarProvider>
+      </div>
+      <main className="absolute z-1 bg-gray-700 flex-1 w-full h-dvh flex items-center justify-center p-6">
+        {/* Entry page container */}
+        <div
+          ref={entryPageRef}
+          className="w-[90%] md:w-[50%] md:max-w-[900px] md:min-w-[700px] h-[90%] bg-white rounded-md shadow-lg relative mx-auto overflow-hidden"
+          style={{
+            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.07)",
+          }}
+        >
+          {/* Fade effects for top and bottom */}
+          <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent z-10 pointer-events-none"></div>
+
+          {/* Scrollable content area */}
+          <div className="h-full overflow-y-auto scrollbar-hide px-8 py-12">
+            {/* New Entry View */}
             {currentView === "new" && (
-              <div className="h-full w-dvh flex flex-col">
-                <div className="flex-1 w-dvh relative">
-                  <Card className="p-6  w-dvh h-full flex flex-col">
-                  <h2 className="text-2xl font-bold mb-4">New Journal Entry</h2>
+              <div className="h-full flex flex-col">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-serif font-bold">New Journal Entry</h2>
+                  <Button onClick={handleSaveNewEntry}>Save Entry</Button>
+                </div>
                 <Textarea
-                  className="flex-1 resize-none mb-4 p-4 text-2xl"
+                  className="flex-1 resize-none mb-4 p-4 text-lg font-serif border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                   placeholder="Write your thoughts here..."
                   value={newEntryContent}
                   onChange={(e) => setNewEntryContent(e.target.value)}
                 />
-                <div className="flex justify-end">
-                  <Button onClick={handleSaveNewEntry}>Save Entry</Button>
-                </div>
-                  </Card>
-                </div>
               </div>
             )}
 
+            {/* Index View */}
             {currentView === "index" && (
-              <Card className="p-6 h-full flex flex-col w-full">
-                <h2 className="text-2xl font-bold mb-4">Journal Index</h2>
-                <div className="flex-1 overflow-auto">
-                  <div className="flex flex-col gap-2">
+              <div className="h-full flex flex-col">
+                <h2 className="text-2xl font-serif font-bold mb-6">Journal Index</h2>
+                <div className="flex-1">
+                  <div className="flex flex-col gap-3">
                     {sortedEntries
                       .slice(currentPage * entriesPerPage, (currentPage + 1) * entriesPerPage)
                       .map((entry, index) => (
-                        <Button
+                        <div
                           key={entry.id}
-                          variant="outline"
-                          className="w-full py-4 flex justify-between items-center text-left"
+                          className="p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
                           onClick={() => handleEntryView(entry.id)}
                         >
-                          <div className="flex flex-col">
-                            <span className="text-sm text-muted-foreground">Entry # {sortedEntries.length - index}</span>
+                          <div className="flex justify-between items-center">
+                            <div className="flex flex-col">
+                              <span className="text-sm text-muted-foreground">
+                                Entry #{sortedEntries.length - index}
+                              </span>
+                              <span className="font-medium">{format(entry.date, "MMMM d, yyyy")}</span>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
                           </div>
-                          
-                        </Button>
+                        </div>
                       ))}
                   </div>
                 </div>
                 {totalPages > 1 && (
-                  <div className="flex justify-between items-center mt-4">
+                  <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
                     <Button variant="outline" size="sm" onClick={handlePrevPage} disabled={currentPage === 0}>
                       <ChevronLeft className="mr-2 h-4 w-4" />
                       Previous
                     </Button>
-                    <span>
+                    <span className="text-sm text-muted-foreground">
                       Page {currentPage + 1} of {totalPages}
                     </span>
                     <Button
@@ -207,69 +244,64 @@ export default function JournalLayout() {
                     </Button>
                   </div>
                 )}
-              </Card>
+              </div>
             )}
 
+            {/* Entry View */}
             {currentView === "entry" && currentEntryId && (
-              <div className="h-full w-dvh flex flex-col">
-                <div className="flex-1 h-full w-dvh relative">
-                  <Card className="p-6 w-dvh h-full flex flex-col">
-                    {sortedEntries.findIndex((e) => e.id === currentEntryId) !== -1 && (
-                      <>
-                        <div className="flex justify-center text-6xl font-bold underline">
-                          Entry # {sortedEntries.length - currentCarouselIndex}
-                        </div>
-                        <div className="flex justify-between items-center mb-4">
-                          <h2 className="text-2xl font-bold">
-                            {format(sortedEntries.find((e) => e.id === currentEntryId)!.date, "eeee, MMMM d, yyyy")}
-                          </h2>
-                          <span className="text-muted-foreground">
-                            {format(sortedEntries.find((e) => e.id === currentEntryId)!.date, "h:mm a")}
-                          </span>
-                        </div>
-                        <ScrollArea className="flex-1 pr-4">
-                          <div className="text-lg whitespace-pre-wrap">
-                            {sortedEntries.find((e) => e.id === currentEntryId)!.content}
-                          </div>
-                        </ScrollArea>
-                      </>
-                    )}
-                    <div className="mt-4 flex justify-center">
+              <div className="h-full flex flex-col">
+                {sortedEntries.findIndex((e) => e.id === currentEntryId) !== -1 && (
+                  <>
+                    <div className="text-center mb-8">
+                      <div className="text-4xl font-serif font-bold mb-1">
+                        Entry #{sortedEntries.length - currentCarouselIndex}
+                      </div>
+                      <div className="text-xl font-medium text-gray-700">
+                        {format(sortedEntries.find((e) => e.id === currentEntryId)!.date, "eeee, MMMM d, yyyy")}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {format(sortedEntries.find((e) => e.id === currentEntryId)!.date, "h:mm a")}
+                      </div>
+                    </div>
+                    <div className="flex-1 font-serif text-lg leading-relaxed whitespace-pre-wrap">
+                      {sortedEntries.find((e) => e.id === currentEntryId)!.content}
+                    </div>
+                    <div className="mt-8 flex justify-center">
                       <span className="text-sm text-muted-foreground">
                         Entry {currentCarouselIndex + 1} of {sortedEntries.length}
                       </span>
                     </div>
-                  </Card>
-
-                  {/* Carousel Navigation */}
-                  <div className="absolute top-1/2 left-0 -translate-y-1/2 flex justify-between w-full px-4 pointer-events-none">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="rounded-full bg-background shadow-md pointer-events-auto"
-                      onClick={handlePrevCarousel}
-                      disabled={currentCarouselIndex === 0}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="rounded-full bg-background shadow-md pointer-events-auto"
-                      onClick={handleNextCarousel}
-                      disabled={currentCarouselIndex === sortedEntries.length - 1}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                
+                  </>
+                )}
               </div>
             )}
           </div>
-        </main>
-      </div>
-    </SidebarProvider>
+
+          {/* Carousel Navigation for Entry View */}
+          {currentView === "entry" && (
+            <div className="absolute top-1/2 left-0 -translate-y-1/2 flex justify-between w-full px-4 pointer-events-none">
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full bg-background/80 backdrop-blur-sm shadow-md pointer-events-auto"
+                onClick={handlePrevCarousel}
+                disabled={currentCarouselIndex === 0}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full bg-background/80 backdrop-blur-sm shadow-md pointer-events-auto"
+                onClick={handleNextCarousel}
+                disabled={currentCarouselIndex === sortedEntries.length - 1}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
   )
 }
