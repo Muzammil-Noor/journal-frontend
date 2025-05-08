@@ -49,7 +49,7 @@ const authSlice = createSlice({
       logout(state) {
         state.token = null;
         state.isLoggedin = false;
-        localStorage.clear();
+        sessionStorage.clear();
       },
     },
     extraReducers: (builder) => {
@@ -64,7 +64,7 @@ const authSlice = createSlice({
           (state, action: PayloadAction<LoginResponse>) => {
             state.isLoading = false;
             state.token = action.payload.token;
-            localStorage.setItem("token", action.payload.token);
+            sessionStorage.setItem("token", action.payload.token);
             state.isLoggedin = true
           }
         )

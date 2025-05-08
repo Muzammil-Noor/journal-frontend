@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'r
 import React, { ReactNode, useEffect} from 'react';
 import Password from "@/components/Password"
 import Journal from "@/components/Journal"
-const isAuthenticated = () => localStorage.getItem('token');
+const isAuthenticated = () => sessionStorage.getItem('token');
 
 interface PrivateRouteProps {
   children: ReactNode;

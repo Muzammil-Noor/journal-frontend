@@ -24,7 +24,7 @@ const initialState: EntryState = {
 export const createEntry = createAsyncThunk(
     'entry/create',
     async (payload: any, { rejectWithValue }) => {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) {
         return rejectWithValue('No authentication token found. Please log in again.');
         }

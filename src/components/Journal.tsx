@@ -57,7 +57,7 @@ export default function JournalLayout() {
     .sort((a, b) => b.date.getTime() - a.date.getTime())
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
+    const token = sessionStorage.getItem("token")
     if (token) {
       dispatch(fetchEntries(token))
     }
