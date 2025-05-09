@@ -59,6 +59,10 @@ function App() {
             path="/login" 
             element={<Password/>} 
           />
+          <Route 
+            path="/*" 
+            element={<Password/>} 
+          />
           <Route
             path="/"
             element={

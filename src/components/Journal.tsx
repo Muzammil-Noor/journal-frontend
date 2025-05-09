@@ -49,12 +49,20 @@ export default function JournalLayout() {
   const totalPages = Math.ceil(entries.length / entriesPerPage)
   const entryPageRef = useRef<HTMLDivElement>(null)
 
-  const sortedEntries = [...entries]
+  let sortedEntries = [...entries]
     .map((entry) => ({
       ...entry,
       date: new Date(entry.date),
     }))
     .sort((a, b) => b.date.getTime() - a.date.getTime())
+    useEffect(()=>{
+      sortedEntries = [...entries]
+      .map((entry) => ({
+        ...entry,
+        date: new Date(entry.date),
+      }))
+      .sort((a, b) => b.date.getTime() - a.date.getTime())
+    }, [entries])
 
   useEffect(() => {
     const token = sessionStorage.getItem("token")
@@ -88,9 +96,13 @@ export default function JournalLayout() {
             newEntryContent,
           }),
         ).unwrap()
+        const token = sessionStorage.getItem("token")
+        if (token) {
+          dispatch(fetchEntries(token))
+        }
         setNewEntryContent("")
       } catch (error: any) {
-        // Handle error
+
       }
     }
   }
@@ -197,7 +209,6 @@ export default function JournalLayout() {
               </div>
             )}
 
-            {/* Index View */}
             {currentView === "index" && (
               <div className="h-full flex flex-col">
                 <h2 className="text-2xl font-bold mb-6">Journal Index</h2>
