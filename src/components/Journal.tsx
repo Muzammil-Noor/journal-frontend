@@ -279,7 +279,7 @@ export default function JournalLayout() {
                     </div>
                     <div className="mt-8 flex justify-center">
                       <span className="text-sm text-muted-foreground">
-                        Entry {currentCarouselIndex + 1} of {sortedEntries.length}
+                        Entry {sortedEntries.length - currentCarouselIndex} of {sortedEntries.length}
                       </span>
                     </div>
                   </>
@@ -290,13 +290,13 @@ export default function JournalLayout() {
 
           {/* Carousel Navigation for Entry View */}
           {currentView === "entry" && (
-            <div className="absolute top-1/2 left-0 -translate-y-1/2 flex justify-between w-full px-4 pointer-events-none">
+            <div className="absolute top-[5%] flex justify-between w-full px-4 pointer-events-none ">
               <Button
                 variant="outline"
                 size="icon"
                 className="rounded-full bg-background/80 backdrop-blur-sm shadow-md pointer-events-auto"
-                onClick={handlePrevCarousel}
-                disabled={currentCarouselIndex === 0}
+                onClick={handleNextCarousel}
+                disabled={currentCarouselIndex === sortedEntries.length - 1}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -304,8 +304,8 @@ export default function JournalLayout() {
                 variant="outline"
                 size="icon"
                 className="rounded-full bg-background/80 backdrop-blur-sm shadow-md pointer-events-auto"
-                onClick={handleNextCarousel}
-                disabled={currentCarouselIndex === sortedEntries.length - 1}
+                onClick={handlePrevCarousel}
+                disabled={currentCarouselIndex === 0}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
