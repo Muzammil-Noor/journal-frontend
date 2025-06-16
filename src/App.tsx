@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import React, { ReactNode, useEffect} from 'react';
 import Password from "@/components/Password"
-import Journal from "@/components/Journal"
+import {Journal} from "@/components/Journal"
 const isAuthenticated = () => sessionStorage.getItem('token');
 
 interface PrivateRouteProps {

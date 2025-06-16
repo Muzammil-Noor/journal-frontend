@@ -25,7 +25,7 @@ const initialState: AuthState = {
 
 export const loginUser = createAsyncThunk<
   LoginResponse,
-  { pin:string },
+  { pin: string },
   { rejectValue: pinErrorResponse }
 >("auth/loginUser", async ({ pin }, thunkAPI) => {
   try {
