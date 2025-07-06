@@ -111,7 +111,7 @@ export  function Journal() {
   const dispatch = useDispatch<AppDispatch>()
   const entries = useSelector((state: RootState) => state.entry.entries)
   const categories = useSelector((state: RootState) => state.entry.categories)
-  const entriesPerPage = 20
+  const entriesPerPage = 8
   const totalPages = Math.ceil(entries.length / entriesPerPage)
   const entryPageRef = useRef<HTMLDivElement>(null)
   let sortedEntries = [...entries]
@@ -462,13 +462,13 @@ export  function Journal() {
                       .map((entry, index) => (
                         <div
                           key={entry.id}
-                          className="p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+                          className="sm:p-4 p-1 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
                           onClick={() => handleEntryView(entry.id)}
                         >
                           <div className="flex justify-between items-center">
                             <div className="flex flex-col">
                               {selectedCategory?.titleStyle == "AUTO_NUMBER" &&(
-                                <span className="font-medium">Entry #{sortedEntries.length - index}</span>
+                                <span className="font-medium">Entry #{sortedEntries.length - index - ((currentPage)*entriesPerPage)}</span>
                               )}
                               {selectedCategory?.titleStyle == "CUSTOM_TITLE" &&(
                                 <span className="font-medium">{entry.title}</span>
@@ -489,10 +489,9 @@ export  function Journal() {
                   </div>
                 </div>
                 {totalPages > 1 && (
-                  <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+                  <div className="flex justify-between sm:justify-center sm:gap-4 items-center pt-4">
                     <Button variant="outline" size="sm" onClick={handlePrevPage} disabled={currentPage === 0}>
                       <ChevronLeft className="mr-2 h-4 w-4" />
-                      Previous
                     </Button>
                     <span className="text-sm text-muted-foreground">
                       Page {currentPage + 1} of {totalPages}
@@ -503,7 +502,6 @@ export  function Journal() {
                       onClick={handleNextPage}
                       disabled={currentPage === totalPages - 1}
                     >
-                      Next
                       <ChevronRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
