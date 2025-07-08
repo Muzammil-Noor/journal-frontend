@@ -291,9 +291,9 @@ export  function Journal() {
   return (
     <div>
       <div className="absolute z-2">
-        <SidebarProvider>
-          <div className="flex min-h-screen bg-stone-100">
-            <Sidebar variant="floating" collapsible="offcanvas" className="z-50 bg-gray-700">
+        <SidebarProvider className="">
+          <div className="flex min-h-screen">
+            <Sidebar variant="floating" collapsible="offcanvas" className="z-50 min-w-[20vw] max-w-[275px] p-0">
               <SidebarHeader className="p-4 pt-3 flex items-center justify-between">
                 <h2 className="text-lg font-bold">Chaotic's Journal</h2>
               </SidebarHeader>
@@ -379,7 +379,7 @@ export  function Journal() {
       <main className="absolute z-1 bg-gray-700 flex-1 w-full h-dvh flex items-center justify-center p-6">
         <div
           ref={entryPageRef}
-          className="w-[90%] md:w-[50%] md:max-w-[900px] md:min-w-[700px] h-[90%] bg-white rounded-md shadow-lg relative mx-auto overflow-hidden"
+          className="w-full md:w-[50%] md:max-w-[900px] sm:min-w-[700px] h-[95vh] bg-white rounded-md shadow-lg relative mx-auto overflow-hidden"
           style={{
             boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.07)",
           }}
@@ -389,7 +389,7 @@ export  function Journal() {
           <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent z-10 pointer-events-none"></div>
 
           {/* Scrollable content area */}
-          <div className="h-full overflow-y-auto scrollbar-hide px-6 py-10">
+          <div className="h-full overflow-y-auto scrollbar-hide px-6 py-8">
             {/* New Entry View */}
             {currentView === "new" && (
               <div className="h-full flex flex-col">
@@ -456,7 +456,7 @@ export  function Journal() {
                 </div>
                 
                 <div className="flex-1">
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col">
                     {sortedEntries
                       .slice(currentPage * entriesPerPage, (currentPage + 1) * entriesPerPage)
                       .map((entry, index) => (
@@ -482,7 +482,6 @@ export  function Journal() {
                                 </span>
                               )}
                             </div>
-                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
                           </div>
                         </div>
                       ))}
