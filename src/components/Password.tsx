@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Eye, EyeOff } from "lucide-react"
 import {loginUser} from "@/features/auth"
+import bcrypt from 'bcryptjs'
 
 export default function PinEntry() {
   const [pin, setPin] = useState<string>("")
@@ -55,14 +56,14 @@ export default function PinEntry() {
     setPin((prev) => prev.slice(0, -1))
   }
 
-  const handleEnter = () => {
+  const handleEnter = async () => {
     if (pin.length === 6) {
       try{
-        dispatch(loginUser({ pin }));
+        const pinHash = await bcrypt.hash(pin, 10)
+        await dispatch(loginUser({ pin:  pinHash}));
         setPin("")
       }
       catch(error:any){
-        console.log(pinError)
         setError(pinError)
       }
     } else {
