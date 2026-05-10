@@ -457,7 +457,7 @@ export  function Journal() {
                 </div>
                 
                 <div className="flex-1">
-                  <div className="flex flex-col">
+                  <div className="grid grid-rows-8 h-full">
                     {sortedEntries
                       .slice(currentPage * entriesPerPage, (currentPage + 1) * entriesPerPage)
                       .map((entry, index) => (
