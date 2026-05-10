@@ -154,6 +154,7 @@ export  function Journal() {
 
   const handleIndexView = () => {
     setCurrentView("index")
+    setCurrentPage(0)
     setCurrentCarouselIndex(0)
   }
 
