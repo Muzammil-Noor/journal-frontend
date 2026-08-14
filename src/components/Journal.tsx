@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   Plus,
   BookOpen,
@@ -11,7 +12,9 @@ import {
   Trash2,
   Book,
   BookOpenText,
-
+  Lock,
+  NotebookPen,
+  PanelLeftClose,
   Earth,
   Code,
   CodeXml,
@@ -35,6 +38,11 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarHeader,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupAction,
+  SidebarGroupContent,
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
@@ -49,6 +57,7 @@ import {
   deleteCategory,
   updateCategory,
 } from "@/features/entry"
+import { logout } from "@/features/auth"
 import { CategoryDialog } from "@/components/CategoryDialog"
 
 enum TitleStyle {
@@ -81,6 +90,25 @@ export const iconOptions = [
 ]
 
 const CustomSidebarTrigger = () => {
+  const { toggleSidebar, open, openMobile, isMobile } = useSidebar()
+
+  // The header close button takes over while the sidebar is open
+  if (isMobile ? openMobile : open) return null
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleSidebar}
+      className="fixed top-4 left-4 z-50 h-9 w-9 rounded-lg border border-white/15 bg-white/10 text-white shadow-lg backdrop-blur-md hover:bg-white/20 hover:text-white"
+    >
+      <Menu className="h-5 w-5" />
+      <span className="sr-only">Open Sidebar</span>
+    </Button>
+  )
+}
+
+const SidebarCloseButton = () => {
   const { toggleSidebar } = useSidebar()
 
   return (
@@ -88,10 +116,10 @@ const CustomSidebarTrigger = () => {
       variant="ghost"
       size="icon"
       onClick={toggleSidebar}
-      className="fixed top-4 left-4 z-50 bg-black text-white border-3 border-white backdrop-blur-sm shadow-sm"
+      className="h-7 w-7 shrink-0 text-muted-foreground hover:text-foreground"
     >
-      <Menu className="h-5 w-5" />
-      <span className="sr-only">Toggle Sidebar</span>
+      <PanelLeftClose className="h-4 w-4" />
+      <span className="sr-only">Close Sidebar</span>
     </Button>
   )
 }
@@ -109,6 +137,7 @@ export  function Journal() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [newEntryCategory, setNewEntryCategory] = useState<Category | null>(null)
   const dispatch = useDispatch<AppDispatch>()
+  const navigate = useNavigate()
   const entries = useSelector((state: RootState) => state.entry.entries)
   const categories = useSelector((state: RootState) => state.entry.categories)
   const entriesPerPage = 8
@@ -289,57 +318,72 @@ export  function Journal() {
     return iconOption ? iconOption.icon : CodeXml
   }
 
+  const handleLock = () => {
+    dispatch(logout())
+    navigate("/login", { replace: true })
+  }
+
   return (
     <div>
       <div className="absolute z-2">
         <SidebarProvider className="">
           <div className="flex min-h-screen">
-            <Sidebar variant="floating" collapsible="offcanvas" className="z-50 min-w-[20vw] max-w-[275px] p-0">
-              <SidebarHeader className="p-4 pt-3 flex items-center justify-between">
-                <h2 className="text-lg font-bold">Chaotic's Journal</h2>
+            <Sidebar variant="floating" collapsible="offcanvas" className="z-50">
+              <SidebarHeader className="border-b border-sidebar-border p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
+                      <NotebookPen className="h-4 w-4" />
+                    </div>
+                    <div className="flex min-w-0 flex-col">
+                      <span className="truncate font-serif text-base font-semibold leading-tight">Chaotic's Journal</span>
+                      <span className="truncate text-xs text-muted-foreground">Personal notebook</span>
+                    </div>
+                  </div>
+                  <SidebarCloseButton />
+                </div>
               </SidebarHeader>
               <SidebarContent>
+                <SidebarGroup>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton onClick={handleNewEntry} isActive={currentView === "new"}>
+                          <Plus />
+                          <span>New Entry</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton onClick={handleIndexView} isActive={currentView === "index"}>
+                          <BookOpenText />
+                          <span>Index</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
 
-                <div className="mt-6 px-3">
-                  <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton onClick={handleNewEntry}>
-                      <Plus className="mr-2" />
-                      <span>New Entry</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton onClick={handleIndexView}>
-                      <BookOpenText className="mr-2" />
-                      <span>Index</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-                </div>
-
-                <div className="mt-6 px-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium">Categories</h3>
-                    <Button variant="ghost" size="sm" onClick={handleNewCategory} className="h-6 w-6 p-0">
-                      <Plus className="h-3 w-3" />
-                    </Button>
-                  </div>
-                  <SidebarMenu>
-                    {Array.isArray(categories) && categories.map((category) => {
-                      const IconComponent = getIconComponent(category.icon)
-                      return (
-                        <SidebarMenuItem key={category.id}>
-                          <div className="flex items-center justify-between w-full">
-                            <div
-                              className={`flex items-center gap-2 flex-1 px-2 py-1 rounded-md cursor-pointer w-[80%] truncate hover:bg-sidebar-accent transition-colors ${
-                                selectedCategory?.id === category.id ? "bg-gray-200" : ""
-                              }`}
+                <SidebarGroup>
+                  <SidebarGroupLabel>Categories</SidebarGroupLabel>
+                  <SidebarGroupAction title="Add category" onClick={handleNewCategory}>
+                    <Plus />
+                    <span className="sr-only">Add category</span>
+                  </SidebarGroupAction>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {Array.isArray(categories) && categories.map((category) => {
+                        const IconComponent = getIconComponent(category.icon)
+                        return (
+                          <SidebarMenuItem key={category.id}>
+                            <SidebarMenuButton
+                              isActive={selectedCategory?.id === category.id}
                               onClick={() => {handleCategoryClick(category);handleIndexView();}}
+                              className="pr-14"
                             >
-                              <IconComponent className="h-4 w-4" />
-                              <span className="text-sm">{category.name}</span>
-                            </div>
-                            <div className="flex gap-1 px-1 w-[20%]">
+                              <IconComponent />
+                              <span>{category.name}</span>
+                            </SidebarMenuButton>
+                            <div className="absolute top-1/2 right-1 flex -translate-y-1/2 gap-0.5 opacity-100 transition-opacity md:opacity-0 md:group-hover/menu-item:opacity-100 md:group-focus-within/menu-item:opacity-100">
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -347,9 +391,10 @@ export  function Journal() {
                                   e.stopPropagation()
                                   handleEditCategory(category)
                                 }}
-                                className="h-6 w-6 p-0 hover:bg-sidebar-accent-foreground/10"
+                                className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
                               >
                                 <Edit className="h-3 w-3" />
+                                <span className="sr-only">Edit {category.name}</span>
                               </Button>
                               <Button
                                 variant="ghost"
@@ -358,18 +403,34 @@ export  function Journal() {
                                   e.stopPropagation()
                                   handleDeleteCategory(category.id)
                                 }}
-                                className="h-6 w-6 p-0 hover:bg-red-500/10 hover:text-red-500"
+                                className="h-6 w-6 p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                               >
                                 <Trash2 className="h-3 w-3" />
+                                <span className="sr-only">Delete {category.name}</span>
                               </Button>
                             </div>
-                          </div>
-                        </SidebarMenuItem>
-                      )
-                    })}
-                  </SidebarMenu>
-                </div>
+                          </SidebarMenuItem>
+                        )
+                      })}
+                      {Array.isArray(categories) && categories.length === 0 && (
+                        <p className="px-2 py-1.5 text-xs text-muted-foreground">
+                          No categories yet. Click + to create one.
+                        </p>
+                      )}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
               </SidebarContent>
+              <SidebarFooter className="border-t border-sidebar-border p-3">
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton onClick={handleLock} className="text-muted-foreground hover:text-foreground">
+                      <Lock />
+                      <span>Lock journal</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarFooter>
             </Sidebar>
 
             <CustomSidebarTrigger />
@@ -377,7 +438,7 @@ export  function Journal() {
         </SidebarProvider>
       </div>
 
-      <main className="absolute z-1 bg-gray-700 flex-1 w-full h-dvh flex items-center justify-center p-6">
+      <main className="absolute z-1 bg-gradient-to-br from-stone-800 to-stone-900 flex-1 w-full h-dvh flex items-center justify-center p-6">
         <div
           ref={entryPageRef}
           className="w-full md:w-[50%] md:max-w-[900px] sm:min-w-[700px] h-[95vh] bg-white rounded-md shadow-lg relative mx-auto overflow-hidden"
