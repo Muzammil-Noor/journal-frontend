@@ -1,65 +1,62 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import { Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react"
-import type { LucideProps } from "lucide-react"
+import React, { useEffect, useState } from "react";
+import { Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
+import type { LucideProps } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
 
-type IconType = React.ElementType<LucideProps>
+type IconType = React.ElementType<LucideProps>;
 
 export interface SidebarItemAction {
-  label: string
-  icon: IconType
-  onClick: () => void
-  destructive?: boolean
+  label: string;
+  icon: IconType;
+  onClick: () => void;
+  destructive?: boolean;
 }
 
 export interface SidebarItem {
-  id: string
-  label: string
-  icon: IconType
-  count?: number
-  active?: boolean
-  actions?: SidebarItemAction[]
+  id: string;
+  label: string;
+  icon: IconType;
+  count?: number;
+  active?: boolean;
+  actions?: SidebarItemAction[];
 }
 
 export interface SidebarCategory {
-  category: string
-  icon: IconType
-  /** Render as a collapsible accordion group; otherwise items render flat. */
-  collapsible?: boolean
-  /** Optional action button on the group header row (e.g. "add"). */
-  action?: SidebarItemAction
-  /** Shown inside an empty collapsible group. */
-  emptyHint?: string
-  items: SidebarItem[]
+  category: string;
+  icon: IconType;
+  collapsible?: boolean;
+  action?: SidebarItemAction;
+  emptyHint?: string;
+  items: SidebarItem[];
 }
 
 interface SidebarProps {
-  navItems: SidebarCategory[]
-  activeComponent?: string
-  setActiveComponent: (component: string) => void
-  isOpen: boolean
-  setIsOpen: (isOpen: boolean) => void
-  portalName: string
-  portalSubtitle?: string
-  portalIcon?: IconType
-  footerItems?: SidebarItem[]
+  navItems: SidebarCategory[];
+  activeComponent?: string;
+  setActiveComponent: (component: string) => void;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  portalName: string;
+  portalSubtitle?: string;
+  portalIcon?: IconType;
+  footerItems?: SidebarItem[];
 }
 
 const NavButton: React.FC<{
-  item: SidebarItem
-  showIconOnly: boolean
-  onNavigate: (id: string) => void
+  item: SidebarItem;
+  showIconOnly: boolean;
+  onNavigate: (id: string) => void;
 }> = ({ item, showIconOnly, onNavigate }) => {
-  const Icon = item.icon
-  const hasActions = !showIconOnly && !!item.actions?.length
+  const Icon = item.icon;
+  const hasActions = !showIconOnly && !!item.actions?.length;
   return (
     <div className="group/nav relative">
       <button
@@ -77,7 +74,12 @@ const NavButton: React.FC<{
       >
         <Icon size={showIconOnly ? 22 : 18} className="shrink-0" />
         {!showIconOnly && (
-          <span className={cn("min-w-0 flex-1 truncate text-left", item.active && "font-semibold")}>
+          <span
+            className={cn(
+              "min-w-0 flex-1 truncate text-left",
+              item.active && "font-semibold",
+            )}
+          >
             {item.label}
           </span>
         )}
@@ -103,8 +105,8 @@ const NavButton: React.FC<{
                     : "text-muted-foreground hover:bg-accent hover:text-foreground",
               )}
               onClick={(e) => {
-                e.stopPropagation()
-                action.onClick()
+                e.stopPropagation();
+                action.onClick();
               }}
             >
               <action.icon size={13} />
@@ -114,8 +116,8 @@ const NavButton: React.FC<{
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 const Sidebar: React.FC<SidebarProps> = ({
   navItems,
@@ -130,52 +132,56 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== "undefined" && window.innerWidth < 768,
-  )
+  );
   // What the panel currently renders (desktop): rail = icons only. Swapped
   // mid-transition so content crossfades instead of blanking out.
-  const [railMode, setRailMode] = useState(!isOpen)
-  const [contentVisible, setContentVisible] = useState(true)
+  const [railMode, setRailMode] = useState(!isOpen);
+  const [contentVisible, setContentVisible] = useState(true);
   const [openCategories, setOpenCategories] = useState<string[]>(() =>
-    navItems.filter((group) => group.collapsible).map((group) => group.category),
-  )
+    navItems
+      .filter((group) => group.collapsible)
+      .map((group) => group.category),
+  );
 
   useEffect(() => {
-    const checkIfMobile = () => setIsMobile(window.innerWidth < 768)
-    checkIfMobile()
-    window.addEventListener("resize", checkIfMobile)
-    return () => window.removeEventListener("resize", checkIfMobile)
-  }, [])
+    const checkIfMobile = () => setIsMobile(window.innerWidth < 768);
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
 
   useEffect(() => {
     if (isMobile) {
-      setRailMode(false)
-      setContentVisible(true)
-      return
+      setRailMode(false);
+      setContentVisible(true);
+      return;
     }
     if (railMode === !isOpen) {
-      setContentVisible(true)
-      return
+      setContentVisible(true);
+      return;
     }
-    setContentVisible(false)
+    setContentVisible(false);
     const timeout = setTimeout(() => {
-      setRailMode(!isOpen)
+      setRailMode(!isOpen);
       // let the swapped tree mount at opacity-0 before fading it in
-      requestAnimationFrame(() => requestAnimationFrame(() => setContentVisible(true)))
-    }, 150)
-    return () => clearTimeout(timeout)
-  }, [isOpen, isMobile, railMode])
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => setContentVisible(true)),
+      );
+    }, 150);
+    return () => clearTimeout(timeout);
+  }, [isOpen, isMobile, railMode]);
 
   const handleNavigation = (component: string) => {
-    setActiveComponent(component)
-    if (isMobile) setIsOpen(false)
-  }
+    setActiveComponent(component);
+    if (isMobile) setIsOpen(false);
+  };
 
-  const iconOnly = railMode && !isMobile
+  const iconOnly = railMode && !isMobile;
 
   const withActive = (item: SidebarItem): SidebarItem => ({
     ...item,
     active: item.active ?? activeComponent === item.id,
-  })
+  });
 
   const renderNav = () => (
     <nav>
@@ -184,11 +190,15 @@ const Sidebar: React.FC<SidebarProps> = ({
           if (!group.collapsible) {
             return group.items.map((item) => (
               <li key={item.id}>
-                <NavButton item={withActive(item)} showIconOnly={iconOnly} onNavigate={handleNavigation} />
+                <NavButton
+                  item={withActive(item)}
+                  showIconOnly={iconOnly}
+                  onNavigate={handleNavigation}
+                />
               </li>
-            ))
+            ));
           }
-          const GroupIcon = group.icon
+          const GroupIcon = group.icon;
           return (
             <li key={group.category} className="pt-2">
               <Accordion
@@ -202,13 +212,19 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <AccordionTrigger
                       className={cn(
                         "cursor-pointer rounded-lg p-3 py-2.5 text-muted-foreground transition-colors duration-300 hover:bg-accent hover:text-accent-foreground",
-                        iconOnly && "justify-center gap-0 py-3 [&>svg:last-child]:hidden",
+                        iconOnly &&
+                          "justify-center gap-0 py-3 [&>svg:last-child]:hidden",
                       )}
                     >
                       <span className="flex min-w-0 items-center gap-2.5">
-                        <GroupIcon size={iconOnly ? 22 : 18} className="shrink-0" />
+                        <GroupIcon
+                          size={iconOnly ? 22 : 18}
+                          className="shrink-0"
+                        />
                         {!iconOnly && (
-                          <span className="truncate text-sm font-medium">{group.category}</span>
+                          <span className="truncate text-sm font-medium">
+                            {group.category}
+                          </span>
                         )}
                       </span>
                     </AccordionTrigger>
@@ -218,8 +234,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                         title={group.action.label}
                         className="absolute top-1/2 right-8 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                         onClick={(e) => {
-                          e.stopPropagation()
-                          group.action!.onClick()
+                          e.stopPropagation();
+                          group.action!.onClick();
                         }}
                       >
                         <group.action.icon size={14} />
@@ -237,24 +253,30 @@ const Sidebar: React.FC<SidebarProps> = ({
                     >
                       {group.items.map((item) => (
                         <li key={item.id}>
-                          <NavButton item={withActive(item)} showIconOnly={iconOnly} onNavigate={handleNavigation} />
+                          <NavButton
+                            item={withActive(item)}
+                            showIconOnly={iconOnly}
+                            onNavigate={handleNavigation}
+                          />
                         </li>
                       ))}
-                      {group.items.length === 0 && !iconOnly && group.emptyHint && (
-                        <li className="px-2 py-1.5 text-xs text-muted-foreground">
-                          {group.emptyHint}
-                        </li>
-                      )}
+                      {group.items.length === 0 &&
+                        !iconOnly &&
+                        group.emptyHint && (
+                          <li className="px-2 py-1.5 text-xs text-muted-foreground">
+                            {group.emptyHint}
+                          </li>
+                        )}
                     </ul>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
             </li>
-          )
+          );
         })}
       </ul>
     </nav>
-  )
+  );
 
   return (
     <>
@@ -265,9 +287,15 @@ const Sidebar: React.FC<SidebarProps> = ({
         aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
       >
         {isOpen ? (
-          isMobile ? <X size={18} /> : <PanelLeftClose size={18} />
+          isMobile ? (
+            <X size={18} />
+          ) : (
+            <PanelLeftClose size={18} />
+          )
+        ) : isMobile ? (
+          <Menu size={18} />
         ) : (
-          isMobile ? <Menu size={18} /> : <PanelLeftOpen size={18} />
+          <PanelLeftOpen size={18} />
         )}
       </button>
 
@@ -323,7 +351,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                     {portalName}
                   </h2>
                   {portalSubtitle && (
-                    <p className="truncate text-xs text-muted-foreground">{portalSubtitle}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {portalSubtitle}
+                    </p>
                   )}
                 </div>
               </div>
@@ -334,7 +364,12 @@ const Sidebar: React.FC<SidebarProps> = ({
           )}
 
           {footerItems.length > 0 && (
-            <div className={cn("shrink-0 border-t border-sidebar-border p-2", iconOnly ? "w-18" : "w-72")}>
+            <div
+              className={cn(
+                "shrink-0 border-t border-sidebar-border p-2",
+                iconOnly ? "w-18" : "w-72",
+              )}
+            >
               {footerItems.map((item) => (
                 <NavButton
                   key={item.id}
@@ -348,7 +383,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   BookOpen,
@@ -22,17 +22,23 @@ import {
   BookUser,
   Eclipse,
   LoaderPinwheel,
-  Rotate3D
-} from "lucide-react"
-import type { AppDispatch } from "@/store"
-import type { RootState } from "@/store"
-import { useDispatch, useSelector } from "react-redux"
-import { format } from "date-fns"
-import Sidebar, { type SidebarCategory } from "@/components/Sidebar"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+  Rotate3D,
+} from "lucide-react";
+import type { AppDispatch } from "@/store";
+import type { RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { format } from "date-fns";
+import Sidebar, { type SidebarCategory } from "@/components/Sidebar";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   createEntry,
   fetchEntries,
@@ -40,9 +46,9 @@ import {
   fetchCategories,
   deleteCategory,
   updateCategory,
-} from "@/features/entry"
-import { logout } from "@/features/auth"
-import { CategoryDialog } from "@/components/CategoryDialog"
+} from "@/features/entry";
+import { logout } from "@/features/auth";
+import { CategoryDialog } from "@/components/CategoryDialog";
 
 enum TitleStyle {
   AUTO_NUMBER = "AUTO_NUMBER",
@@ -51,11 +57,11 @@ enum TitleStyle {
 }
 
 interface Category {
-  id: number | undefined
-  name: string
-  icon: string
-  titleStyle: TitleStyle
-  recordDateTime: boolean
+  id: number | undefined;
+  name: string;
+  icon: string;
+  titleStyle: TitleStyle;
+  recordDateTime: boolean;
 }
 
 export const iconOptions = [
@@ -71,36 +77,46 @@ export const iconOptions = [
   { name: "Eclipse", icon: Eclipse },
   { name: "Rotate3D", icon: Rotate3D },
   { name: "LoaderPinwheel", icon: LoaderPinwheel },
-]
+];
 
-export  function Journal() {
-  const [currentView, setCurrentView] = useState<"new" | "index" | "entry">("new")
+export function Journal() {
+  const [currentView, setCurrentView] = useState<"new" | "index" | "entry">(
+    "new",
+  );
   const [sidebarOpen, setSidebarOpen] = useState(
     () => typeof window !== "undefined" && window.innerWidth >= 768,
-  )
-  const [showCategoryDialog, setShowCategoryDialog] = useState(false)
-  const [categoryDialogMode, setCategoryDialogMode] = useState<"new" | "edit">("new")
-  const [editingCategory, setEditingCategory] = useState<Category | undefined>()
-  const [currentEntryId, setCurrentEntryId] = useState<number | null>(null)
-  const [newEntryContent, setNewEntryContent] = useState("")
-  const [newEntryTitle, setNewEntryTitle] = useState("")
-  const [currentPage, setCurrentPage] = useState(0)
-  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0)
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
-  const [newEntryCategory, setNewEntryCategory] = useState<Category | null>(null)
-  const dispatch = useDispatch<AppDispatch>()
-  const navigate = useNavigate()
-  const entries = useSelector((state: RootState) => state.entry.entries)
-  const categories = useSelector((state: RootState) => state.entry.categories)
-  const entriesPerPage = 8
-  const totalPages = Math.ceil(entries.length / entriesPerPage)
-  const entryPageRef = useRef<HTMLDivElement>(null)
+  );
+  const [showCategoryDialog, setShowCategoryDialog] = useState(false);
+  const [categoryDialogMode, setCategoryDialogMode] = useState<"new" | "edit">(
+    "new",
+  );
+  const [editingCategory, setEditingCategory] = useState<
+    Category | undefined
+  >();
+  const [currentEntryId, setCurrentEntryId] = useState<number | null>(null);
+  const [newEntryContent, setNewEntryContent] = useState("");
+  const [newEntryTitle, setNewEntryTitle] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null,
+  );
+  const [newEntryCategory, setNewEntryCategory] = useState<Category | null>(
+    null,
+  );
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const entries = useSelector((state: RootState) => state.entry.entries);
+  const categories = useSelector((state: RootState) => state.entry.categories);
+  const entriesPerPage = 8;
+  const totalPages = Math.ceil(entries.length / entriesPerPage);
+  const entryPageRef = useRef<HTMLDivElement>(null);
   let sortedEntries = [...entries]
     .map((entry) => ({
       ...entry,
       date: new Date(entry.date),
     }))
-    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
 
   useEffect(() => {
     sortedEntries = [...entries]
@@ -108,188 +124,191 @@ export  function Journal() {
         ...entry,
         date: new Date(entry.date),
       }))
-      .sort((a, b) => b.date.getTime() - a.date.getTime())
-  }, [entries])
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+  }, [entries]);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token")
+    const token = sessionStorage.getItem("token");
     if (token) {
-      dispatch(fetchCategories(token))
+      dispatch(fetchCategories(token));
     }
-  }, [dispatch])
+  }, [dispatch]);
 
   useEffect(() => {
     if (categories?.length > 0 && !selectedCategory) {
-      setSelectedCategory(categories[0])
+      setSelectedCategory(categories[0]);
       const token = sessionStorage.getItem("token");
-      if(token){
-        dispatch(fetchEntries({token,category: categories[0].id}))
+      if (token) {
+        dispatch(fetchEntries({ token, category: categories[0].id }));
       }
     }
-  }, [categories, selectedCategory])
+  }, [categories, selectedCategory]);
 
   const handleNewEntry = () => {
-    setCurrentView("new")
-    setCurrentCarouselIndex(0)
-  }
+    setCurrentView("new");
+    setCurrentCarouselIndex(0);
+  };
 
   const handleIndexView = () => {
-    setCurrentView("index")
-    setCurrentPage(0)
-    setCurrentCarouselIndex(0)
-  }
+    setCurrentView("index");
+    setCurrentPage(0);
+    setCurrentCarouselIndex(0);
+  };
 
   const handleEntryView = (id: number) => {
-    setCurrentView("entry")
-    setCurrentEntryId(id)
-    const entryIndex = sortedEntries.findIndex((entry) => entry.id === id)
-    setCurrentCarouselIndex(entryIndex)
-  }
+    setCurrentView("entry");
+    setCurrentEntryId(id);
+    const entryIndex = sortedEntries.findIndex((entry) => entry.id === id);
+    setCurrentCarouselIndex(entryIndex);
+  };
 
   const handleCategoryClick = (category: Category) => {
-    setSelectedCategory(category)
+    setSelectedCategory(category);
     const token = sessionStorage.getItem("token");
-    if(token){
-      dispatch(fetchEntries({token,category:category.id}))
+    if (token) {
+      dispatch(fetchEntries({ token, category: category.id }));
     }
-  }
+  };
 
   const handleSaveNewEntry = async () => {
-    if(newEntryCategory === null){
-      return
+    if (newEntryCategory === null) {
+      return;
     }
     if (newEntryContent.trim()) {
       try {
-        console.log("Saving entry with category:", newEntryCategory)
+        console.log("Saving entry with category:", newEntryCategory);
         await dispatch(
           createEntry({
             newEntryContent,
             newEntryTitle,
             categoryId: newEntryCategory.id,
           }),
-        ).unwrap()
-        setNewEntryContent("")
-        setNewEntryTitle("")
+        ).unwrap();
+        setNewEntryContent("");
+        setNewEntryTitle("");
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     }
-  }
+  };
 
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1)
+      setCurrentPage(currentPage + 1);
     }
-  }
+  };
 
   const handlePrevPage = () => {
     if (currentPage > 0) {
-      setCurrentPage(currentPage - 1)
+      setCurrentPage(currentPage - 1);
     }
-  }
+  };
 
   const handleNextCarousel = () => {
     if (currentView === "entry" && currentCarouselIndex < entries.length - 1) {
-      setCurrentCarouselIndex(currentCarouselIndex + 1)
-      setCurrentEntryId(sortedEntries[currentCarouselIndex + 1].id)
+      setCurrentCarouselIndex(currentCarouselIndex + 1);
+      setCurrentEntryId(sortedEntries[currentCarouselIndex + 1].id);
     }
-  }
+  };
 
   const handlePrevCarousel = () => {
     if (currentView === "entry" && currentCarouselIndex > 0) {
-      setCurrentCarouselIndex(currentCarouselIndex - 1)
-      setCurrentEntryId(sortedEntries[currentCarouselIndex - 1].id)
+      setCurrentCarouselIndex(currentCarouselIndex - 1);
+      setCurrentEntryId(sortedEntries[currentCarouselIndex - 1].id);
     }
-  }
+  };
 
   const handleNewCategory = () => {
-    setCategoryDialogMode("new")
-    setEditingCategory(undefined)
-    setShowCategoryDialog(true)
-  }
+    setCategoryDialogMode("new");
+    setEditingCategory(undefined);
+    setShowCategoryDialog(true);
+  };
 
   const handleEditCategory = (category: Category) => {
-    setCategoryDialogMode("edit")
-    setEditingCategory(category)
-    setShowCategoryDialog(true)
-  }
+    setCategoryDialogMode("edit");
+    setEditingCategory(category);
+    setShowCategoryDialog(true);
+  };
 
   const handleDeleteCategory = async (categoryId: number) => {
-    const token = sessionStorage.getItem("token")
-    if(token){
-      await dispatch(deleteCategory({token, categoryId}))
-      await dispatch(fetchCategories(token))
-      console.log(categories)
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      await dispatch(deleteCategory({ token, categoryId }));
+      await dispatch(fetchCategories(token));
+      console.log(categories);
     }
-  }
+  };
 
   const handleSaveCategory = async (categoryData: Category) => {
     if (categoryDialogMode === "new") {
-      const token = sessionStorage.getItem("token")
-        try{
-          if (token) {
-            await dispatch(
-              createCategory({
-                name: categoryData.name,
-                icon: categoryData.icon,
-                recordDateTime: categoryData.recordDateTime,
-                titleStyle: categoryData.titleStyle,
+      const token = sessionStorage.getItem("token");
+      try {
+        if (token) {
+          await dispatch(
+            createCategory({
+              name: categoryData.name,
+              icon: categoryData.icon,
+              recordDateTime: categoryData.recordDateTime,
+              titleStyle: categoryData.titleStyle,
             }),
-           ).unwrap()
-            await dispatch(fetchCategories(token))
-          }
+          ).unwrap();
+          await dispatch(fetchCategories(token));
         }
-        catch(error: any){
-
-        }
-    }
-    else if (editingCategory) {
-      const token = sessionStorage.getItem("token")
-        try{
-          if (token) {
-            await dispatch(
-              updateCategory({
-                id: categoryData.id,
-                name: categoryData.name,
-                icon: categoryData.icon,
-                recordDateTime: categoryData.recordDateTime,
-                titleStyle: categoryData.titleStyle,
+      } catch (error: any) {}
+    } else if (editingCategory) {
+      const token = sessionStorage.getItem("token");
+      try {
+        if (token) {
+          await dispatch(
+            updateCategory({
+              id: categoryData.id,
+              name: categoryData.name,
+              icon: categoryData.icon,
+              recordDateTime: categoryData.recordDateTime,
+              titleStyle: categoryData.titleStyle,
             }),
-           ).unwrap()
-            await dispatch(fetchCategories(token))
-          }
+          ).unwrap();
+          await dispatch(fetchCategories(token));
         }
-        catch(error: any){
-
-        }
+      } catch (error: any) {}
     }
-  }
+  };
 
   const getIconComponent = (iconName: string) => {
-    const iconOption = iconOptions.find((opt) => opt.name === iconName)
-    return iconOption ? iconOption.icon : CodeXml
-  }
+    const iconOption = iconOptions.find((opt) => opt.name === iconName);
+    return iconOption ? iconOption.icon : CodeXml;
+  };
 
   const handleLock = () => {
-    dispatch(logout())
-    navigate("/login", { replace: true })
-  }
+    dispatch(logout());
+    navigate("/login", { replace: true });
+  };
 
-  const safeCategories = Array.isArray(categories) ? categories : []
+  const safeCategories = Array.isArray(categories) ? categories : [];
 
   const navItems: SidebarCategory[] = [
     {
       category: "Journal",
       icon: NotebookPen,
       items: [
-        { id: "new", label: "New Entry", icon: Plus, active: currentView === "new" },
-        { id: "index", label: "Index", icon: BookOpenText, active: currentView !== "new" },
+        {
+          id: "new",
+          label: "New Entry",
+          icon: Plus,
+          active: currentView === "new",
+        },
+        {
+          id: "index",
+          label: "Index",
+          icon: BookOpenText,
+          active: currentView !== "new",
+        },
       ],
     },
     {
       category: "Categories",
       icon: LibraryBig,
-      collapsible: true,
+      collapsible: false,
       action: { label: "Add category", icon: Plus, onClick: handleNewCategory },
       emptyHint: "No categories yet. Click + to create one.",
       items: safeCategories.map((category) => ({
@@ -298,7 +317,11 @@ export  function Journal() {
         icon: getIconComponent(category.icon),
         active: currentView !== "new" && selectedCategory?.id === category.id,
         actions: [
-          { label: "Edit", icon: Edit, onClick: () => handleEditCategory(category) },
+          {
+            label: "Edit",
+            icon: Edit,
+            onClick: () => handleEditCategory(category),
+          },
           {
             label: "Delete",
             icon: Trash2,
@@ -308,23 +331,23 @@ export  function Journal() {
         ],
       })),
     },
-  ]
+  ];
 
   const handleSidebarNavigate = (id: string) => {
     if (id === "new") {
-      handleNewEntry()
+      handleNewEntry();
     } else if (id === "index") {
-      handleIndexView()
+      handleIndexView();
     } else if (id === "lock") {
-      handleLock()
+      handleLock();
     } else if (id.startsWith("category-")) {
-      const category = safeCategories.find((c) => `category-${c.id}` === id)
+      const category = safeCategories.find((c) => `category-${c.id}` === id);
       if (category) {
-        handleCategoryClick(category)
-        handleIndexView()
+        handleCategoryClick(category);
+        handleIndexView();
       }
     }
-  }
+  };
 
   return (
     <div>
@@ -344,7 +367,8 @@ export  function Journal() {
           ref={entryPageRef}
           className="w-full md:w-[50%] md:max-w-[900px] sm:min-w-[700px] h-[95vh] bg-white rounded-md shadow-lg relative mx-auto overflow-hidden"
           style={{
-            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.07)",
+            boxShadow:
+              "0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.07)",
           }}
         >
           {/* Fade effects for top and bottom */}
@@ -357,32 +381,49 @@ export  function Journal() {
             {currentView === "new" && (
               <div className="h-full flex flex-col">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-serif font-bold">New Journal Entry</h2>
+                  <h2 className="text-2xl font-serif font-bold">
+                    New Journal Entry
+                  </h2>
                   <div className="flex items-center gap-3">
                     <div className="flex gap-3 flex-col sm:flex-row w-[50%] sm:w-[100%]">
-                      <Label htmlFor="category-select" className="text-sm font-medium">
+                      <Label
+                        htmlFor="category-select"
+                        className="text-sm font-medium"
+                      >
                         Category:
                       </Label>
                       <div className="flex items-center gap-2">
                         <Select
                           value={newEntryCategory?.id?.toString() || ""}
-                          onValueChange={(value) => setNewEntryCategory(categories.find((e) => e.id === parseInt(value)) ?? null)}
+                          onValueChange={(value) =>
+                            setNewEntryCategory(
+                              categories.find(
+                                (e) => e.id === parseInt(value),
+                              ) ?? null,
+                            )
+                          }
                         >
                           <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.isArray(categories) && categories.map((category) => {
-                              const IconComponent = getIconComponent(category.icon)
-                              return (
-                                <SelectItem key={category.id} value={category.id.toString()}>
-                                  <div className="flex items-center gap-2">
-                                    <IconComponent className="h-4 w-4" />
-                                    <span>{category.name}</span>
-                                  </div>
-                                </SelectItem>
-                              )
-                            })}
+                            {Array.isArray(categories) &&
+                              categories.map((category) => {
+                                const IconComponent = getIconComponent(
+                                  category.icon,
+                                );
+                                return (
+                                  <SelectItem
+                                    key={category.id}
+                                    value={category.id.toString()}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <IconComponent className="h-4 w-4" />
+                                      <span>{category.name}</span>
+                                    </div>
+                                  </SelectItem>
+                                );
+                              })}
                           </SelectContent>
                         </Select>
                       </div>
@@ -390,14 +431,16 @@ export  function Journal() {
                     </div>
                   </div>
                 </div>
-                {newEntryCategory !== null &&(
+                {newEntryCategory !== null && (
                   <div className="h-[100%]">
-                    {newEntryCategory?.titleStyle !== "AUTO_NUMBER" &&(
+                    {newEntryCategory?.titleStyle !== "AUTO_NUMBER" && (
                       <Textarea
                         className="border-none h-[10%] focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-xl font-serif"
                         placeholder="A Title for this entry"
                         value={newEntryTitle}
-                        onChange={(e) => {setNewEntryTitle(e.target.value)}}
+                        onChange={(e) => {
+                          setNewEntryTitle(e.target.value);
+                        }}
                       />
                     )}
                     <Textarea
@@ -414,14 +457,21 @@ export  function Journal() {
             {currentView === "index" && (
               <div className="h-full flex flex-col">
                 <div className="flex items-center justify-center flex-col">
-                  <h2 className="text-2xl font-bold">{selectedCategory?.name}</h2>
-                  <h2 className="text-md font-bold mb-6">({entries?.length} entries)</h2>
+                  <h2 className="text-2xl font-bold">
+                    {selectedCategory?.name}
+                  </h2>
+                  <h2 className="text-md font-bold mb-6">
+                    ({entries?.length} entries)
+                  </h2>
                 </div>
-                
+
                 <div className="flex-1">
                   <div className="grid grid-rows-8 h-full">
                     {sortedEntries
-                      .slice(currentPage * entriesPerPage, (currentPage + 1) * entriesPerPage)
+                      .slice(
+                        currentPage * entriesPerPage,
+                        (currentPage + 1) * entriesPerPage,
+                      )
                       .map((entry, index) => (
                         <div
                           key={entry.id}
@@ -430,16 +480,29 @@ export  function Journal() {
                         >
                           <div className="flex justify-between items-center">
                             <div className="flex flex-col">
-                              {selectedCategory?.titleStyle == "AUTO_NUMBER" &&(
-                                <span className="font-medium">Entry #{sortedEntries.length - index - ((currentPage)*entriesPerPage)}</span>
+                              {selectedCategory?.titleStyle ==
+                                "AUTO_NUMBER" && (
+                                <span className="font-medium">
+                                  Entry #
+                                  {sortedEntries.length -
+                                    index -
+                                    currentPage * entriesPerPage}
+                                </span>
                               )}
-                              {selectedCategory?.titleStyle == "CUSTOM_TITLE" &&(
-                                <span className="font-medium">{entry.title}</span>
+                              {selectedCategory?.titleStyle ==
+                                "CUSTOM_TITLE" && (
+                                <span className="font-medium">
+                                  {entry.title}
+                                </span>
                               )}
-                              {selectedCategory?.titleStyle == "CUSTOM_AND_AUTO" &&(
-                                <span className="font-medium">Entry #{sortedEntries.length - index}: {entry.title}</span>
+                              {selectedCategory?.titleStyle ==
+                                "CUSTOM_AND_AUTO" && (
+                                <span className="font-medium">
+                                  Entry #{sortedEntries.length - index}:{" "}
+                                  {entry.title}
+                                </span>
                               )}
-                              {selectedCategory?.recordDateTime &&(
+                              {selectedCategory?.recordDateTime && (
                                 <span className="text-sm text-muted-foreground">
                                   {format(entry.date, "MMMM d, yyyy")}
                                 </span>
@@ -452,7 +515,12 @@ export  function Journal() {
                 </div>
                 {totalPages > 1 && (
                   <div className="flex justify-between sm:justify-center sm:gap-4 items-center pt-4">
-                    <Button variant="outline" size="sm" onClick={handlePrevPage} disabled={currentPage === 0}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handlePrevPage}
+                      disabled={currentPage === 0}
+                    >
                       <ChevronLeft className="mr-2 h-4 w-4" />
                     </Button>
                     <span className="text-sm text-muted-foreground">
@@ -474,36 +542,54 @@ export  function Journal() {
             {/* Entry View */}
             {currentView === "entry" && currentEntryId && (
               <div className="h-full flex flex-col">
-                {sortedEntries.findIndex((e) => e.id === currentEntryId) !== -1 && (
+                {sortedEntries.findIndex((e) => e.id === currentEntryId) !==
+                  -1 && (
                   <>
                     <div className="text-center mb-8">
-                      { selectedCategory?.titleStyle !== "CUSTOM_TITLE" && (
+                      {selectedCategory?.titleStyle !== "CUSTOM_TITLE" && (
                         <div className="text-4xl font-bold mb-1">
                           Entry #{sortedEntries.length - currentCarouselIndex}
                         </div>
                       )}
                       {selectedCategory?.titleStyle !== "AUTO_NUMBER" && (
                         <div className="text-4xl font-bold mb-1">
-                          {sortedEntries.find((e) => e.id === currentEntryId)!.title}
+                          {
+                            sortedEntries.find((e) => e.id === currentEntryId)!
+                              .title
+                          }
                         </div>
                       )}
                       {selectedCategory?.recordDateTime && (
                         <div>
                           <div className="text-xl font-medium text-gray-700">
-                            {format(sortedEntries.find((e) => e.id === currentEntryId)!.date, "eeee, MMMM d, yyyy")}
+                            {format(
+                              sortedEntries.find(
+                                (e) => e.id === currentEntryId,
+                              )!.date,
+                              "eeee, MMMM d, yyyy",
+                            )}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {format(sortedEntries.find((e) => e.id === currentEntryId)!.date, "h:mm a")}
+                            {format(
+                              sortedEntries.find(
+                                (e) => e.id === currentEntryId,
+                              )!.date,
+                              "h:mm a",
+                            )}
                           </div>
                         </div>
                       )}
                     </div>
                     <div className="flex-1 font-serif text-lg leading-relaxed whitespace-pre-wrap">
-                      {sortedEntries.find((e) => e.id === currentEntryId)!.content}
+                      {
+                        sortedEntries.find((e) => e.id === currentEntryId)!
+                          .content
+                      }
                     </div>
                     <div className="mt-8 flex justify-center">
                       <span className="text-sm text-muted-foreground">
-                        Entry {sortedEntries.length - currentCarouselIndex} of {sortedEntries.length}
+                        Entry {sortedEntries.length - currentCarouselIndex} of{" "}
+                        {sortedEntries.length}
                       </span>
                     </div>
                   </>
@@ -525,13 +611,12 @@ export  function Journal() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-              ):(
+              ) : (
                 <Button
                   variant="outline"
                   size="icon"
                   className="bg-transparent border-none shadow-none"
-                >
-                </Button>
+                ></Button>
               )}
               {currentCarouselIndex !== 0 ? (
                 <Button
@@ -543,13 +628,12 @@ export  function Journal() {
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
-              ):(
+              ) : (
                 <Button
                   variant="outline"
                   size="icon"
                   className="bg-transparent border-none shadow-none"
-                >
-                </Button>
+                ></Button>
               )}
             </div>
           )}
@@ -565,5 +649,5 @@ export  function Journal() {
         onSave={handleSaveCategory}
       />
     </div>
-  )
+  );
 }
