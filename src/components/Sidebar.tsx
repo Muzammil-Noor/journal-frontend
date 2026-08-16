@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
+import { PanelLeftClose, X } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 import {
   Accordion,
