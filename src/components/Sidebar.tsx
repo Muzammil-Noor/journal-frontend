@@ -321,19 +321,26 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           {iconOnly ? (
             <div className="flex min-h-0 w-18 flex-1 flex-col">
-              <div className="flex shrink-0 flex-col items-center gap-2 border-b border-sidebar-border py-3">
-                {PortalIcon && (
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-                    <PortalIcon size={16} />
-                  </div>
-                )}
+              <div className="flex shrink-0 justify-center border-b border-sidebar-border py-3">
                 <button
                   type="button"
-                  className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  className="group/toggle flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm transition-colors hover:bg-primary/85"
                   onClick={() => setIsOpen(true)}
                   aria-label="Expand sidebar"
+                  title="Expand sidebar"
                 >
-                  <PanelLeftOpen size={18} />
+                  {PortalIcon ? (
+                    <>
+                      <span className="group-hover/toggle:hidden">
+                        <PortalIcon size={16} />
+                      </span>
+                      <span className="hidden group-hover/toggle:block">
+                        <PanelLeftOpen size={16} />
+                      </span>
+                    </>
+                  ) : (
+                    <PanelLeftOpen size={16} />
+                  )}
                 </button>
               </div>
               <div className="scrollbar-hide min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-2">
@@ -342,12 +349,29 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
           ) : (
             <div className="flex min-h-0 w-72 flex-1 flex-col">
-              <div className="flex shrink-0 items-center gap-2.5 border-b border-sidebar-border p-4 py-3 pr-3">
-                {PortalIcon && (
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-                    <PortalIcon size={16} />
-                  </div>
-                )}
+              <div className="flex shrink-0 items-center gap-2.5 border-b border-sidebar-border p-4 py-3">
+                <button
+                  type="button"
+                  className="group/toggle flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm transition-colors hover:bg-primary/85"
+                  onClick={() => setIsOpen(false)}
+                  aria-label={isMobile ? "Close sidebar" : "Collapse sidebar"}
+                  title={isMobile ? "Close sidebar" : "Collapse sidebar"}
+                >
+                  {PortalIcon ? (
+                    <>
+                      <span className="group-hover/toggle:hidden">
+                        <PortalIcon size={16} />
+                      </span>
+                      <span className="hidden group-hover/toggle:block">
+                        {isMobile ? <X size={16} /> : <PanelLeftClose size={16} />}
+                      </span>
+                    </>
+                  ) : isMobile ? (
+                    <X size={16} />
+                  ) : (
+                    <PanelLeftClose size={16} />
+                  )}
+                </button>
                 <div className="flex min-w-0 flex-1 flex-col">
                   <h2 className="truncate font-serif text-base font-semibold leading-tight tracking-tight">
                     {portalName}
@@ -358,14 +382,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </p>
                   )}
                 </div>
-                <button
-                  type="button"
-                  className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-                  onClick={() => setIsOpen(false)}
-                  aria-label={isMobile ? "Close sidebar" : "Collapse sidebar"}
-                >
-                  {isMobile ? <X size={18} /> : <PanelLeftClose size={18} />}
-                </button>
               </div>
               <div className="scrollbar-hide min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-3">
                 {renderNav()}
