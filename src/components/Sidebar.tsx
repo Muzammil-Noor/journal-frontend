@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { PanelLeftClose, X } from "lucide-react";
+import { Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 import {
   Accordion,
@@ -280,6 +280,19 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
+      {/* Mobile-only opener: the drawer is fully off-screen when closed, so a
+          floating button is the only way to bring it back. */}
+      {isMobile && !isOpen && (
+        <button
+          type="button"
+          className="fixed top-3 left-3 z-40 flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/15 bg-white/10 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-white/20 print:hidden"
+          onClick={() => setIsOpen(true)}
+          aria-label="Open sidebar"
+        >
+          <Menu size={18} />
+        </button>
+      )}
+
       {isMobile && (
         <div
           className={cn(
@@ -292,7 +305,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       <div
         className={cn(
-          "fixed top-0 left-0 z-30 flex h-[calc(100dvh-3.5rem)] flex-col overflow-hidden rounded-tr-2xl border border-b-0 border-l-0 border-sidebar-border bg-sidebar text-sidebar-foreground shadow-xl transition-[width,transform] duration-300 ease-in-out print:hidden",
+          "fixed top-0 left-0 z-30 flex h-dvh flex-col overflow-hidden border-r border-sidebar-border bg-sidebar text-sidebar-foreground shadow-xl transition-[width,transform] duration-300 ease-in-out print:hidden",
           isMobile
             ? cn("w-72", isOpen ? "translate-x-0" : "-translate-x-full")
             : isOpen
@@ -307,76 +320,57 @@ const Sidebar: React.FC<SidebarProps> = ({
           )}
         >
           {iconOnly ? (
-            <button
-              type="button"
-              className="fixed top-3 left-4.5 z-40 flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/15 bg-white/10 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-white/20 print:hidden"
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-            >
-              {isOpen ? (
-                isMobile ? (
-                  <X size={18} />
-                ) : (
-                  <PanelLeftClose size={18} />
-                )
-              ) : isMobile ? (
-                <div className="flex min-h-0 w-18 flex-1 flex-col">
-                  {PortalIcon && (
-                    <div className="flex shrink-0 justify-center border-b border-sidebar-border py-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-                        <PortalIcon size={16} />
-                      </div>
-                    </div>
-                  )}
-                  <div className="scrollbar-hide min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-2">
-                    {renderNav()}
+            <div className="flex min-h-0 w-18 flex-1 flex-col">
+              <div className="flex shrink-0 flex-col items-center gap-2 border-b border-sidebar-border py-3">
+                {PortalIcon && (
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+                    <PortalIcon size={16} />
                   </div>
-                </div>
-              ) : (
-                <div className="flex min-h-0 w-18 flex-1 flex-col">
-                  {PortalIcon && (
-                    <div className="flex shrink-0 justify-center border-b border-sidebar-border py-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-                        <PortalIcon size={16} />
-                      </div>
-                    </div>
-                  )}
-                  <div className="scrollbar-hide min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-2">
-                    {renderNav()}
-                  </div>
-                </div>
-              )}
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="fixed top-3 left-4.5 z-40 flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/15 bg-white/10 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-white/20 print:hidden"
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-            >
-              <div className="flex min-h-0 w-72 flex-1 flex-col">
-                <div className="flex shrink-0 items-center gap-2.5 border-b border-sidebar-border p-4 py-3">
-                  {PortalIcon && (
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-                      <PortalIcon size={16} />
-                    </div>
-                  )}
-                  <div className="flex min-w-0 flex-col">
-                    <h2 className="truncate font-serif text-base font-semibold leading-tight tracking-tight">
-                      {portalName}
-                    </h2>
-                    {portalSubtitle && (
-                      <p className="truncate text-xs text-muted-foreground">
-                        {portalSubtitle}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="scrollbar-hide min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-3">
-                  {renderNav()}
-                </div>
+                )}
+                <button
+                  type="button"
+                  className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  onClick={() => setIsOpen(true)}
+                  aria-label="Expand sidebar"
+                >
+                  <PanelLeftOpen size={18} />
+                </button>
               </div>
-            </button>
+              <div className="scrollbar-hide min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-2">
+                {renderNav()}
+              </div>
+            </div>
+          ) : (
+            <div className="flex min-h-0 w-72 flex-1 flex-col">
+              <div className="flex shrink-0 items-center gap-2.5 border-b border-sidebar-border p-4 py-3 pr-3">
+                {PortalIcon && (
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+                    <PortalIcon size={16} />
+                  </div>
+                )}
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <h2 className="truncate font-serif text-base font-semibold leading-tight tracking-tight">
+                    {portalName}
+                  </h2>
+                  {portalSubtitle && (
+                    <p className="truncate text-xs text-muted-foreground">
+                      {portalSubtitle}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  onClick={() => setIsOpen(false)}
+                  aria-label={isMobile ? "Close sidebar" : "Collapse sidebar"}
+                >
+                  {isMobile ? <X size={18} /> : <PanelLeftClose size={18} />}
+                </button>
+              </div>
+              <div className="scrollbar-hide min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-3">
+                {renderNav()}
+              </div>
+            </div>
           )}
 
           {footerItems.length > 0 && (
