@@ -356,7 +356,7 @@ export function Journal() {
       <main className="absolute z-1 bg-gradient-to-br from-stone-800 to-stone-900 flex-1 w-full h-dvh flex items-center justify-center p-6 md:pl-24">
         <div
           ref={entryPageRef}
-          className="font-journal w-full md:w-[50%] md:max-w-[900px] sm:min-w-[700px] h-[95vh] bg-white rounded-md shadow-lg relative mx-auto overflow-hidden"
+          className="font-journal h-[95vh] aspect-[9/16] w-auto max-w-full bg-white rounded-md shadow-lg relative mx-auto overflow-hidden"
           style={{
             boxShadow:
               "0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.07)",
@@ -371,53 +371,52 @@ export function Journal() {
             {/* New Entry View */}
             {currentView === "new" && (
               <div className="h-full flex flex-col">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">New Journal Entry</h2>
-                  <div className="flex items-center gap-3">
-                    <div className="flex gap-3 flex-col sm:flex-row w-[50%] sm:w-[100%]">
-                      <Label
-                        htmlFor="category-select"
-                        className="text-sm font-medium"
-                      >
-                        Category:
-                      </Label>
-                      <div className="flex items-center gap-2">
-                        <Select
-                          value={newEntryCategory?.id?.toString() || ""}
-                          onValueChange={(value) =>
-                            setNewEntryCategory(
-                              categories.find(
-                                (e) => e.id === parseInt(value),
-                              ) ?? null,
-                            )
-                          }
-                        >
-                          <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.isArray(categories) &&
-                              categories.map((category) => {
-                                const IconComponent = getIconComponent(
-                                  category.icon,
-                                );
-                                return (
-                                  <SelectItem
-                                    key={category.id}
-                                    value={category.id.toString()}
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <IconComponent className="h-4 w-4" />
-                                      <span>{category.name}</span>
-                                    </div>
-                                  </SelectItem>
-                                );
-                              })}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <Button onClick={handleSaveNewEntry}>Save Entry</Button>
-                    </div>
+                <div className="mb-6 flex flex-col gap-3">
+                  <h2 className="text-xl font-bold whitespace-nowrap">
+                    New Journal Entry
+                  </h2>
+                  <div className="flex items-center gap-2">
+                    <Label
+                      htmlFor="category-select"
+                      className="shrink-0 text-sm font-medium"
+                    >
+                      Category:
+                    </Label>
+                    <Select
+                      value={newEntryCategory?.id?.toString() || ""}
+                      onValueChange={(value) =>
+                        setNewEntryCategory(
+                          categories.find((e) => e.id === parseInt(value)) ??
+                            null,
+                        )
+                      }
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.isArray(categories) &&
+                          categories.map((category) => {
+                            const IconComponent = getIconComponent(
+                              category.icon,
+                            );
+                            return (
+                              <SelectItem
+                                key={category.id}
+                                value={category.id.toString()}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <IconComponent className="h-4 w-4" />
+                                  <span>{category.name}</span>
+                                </div>
+                              </SelectItem>
+                            );
+                          })}
+                      </SelectContent>
+                    </Select>
+                    <Button onClick={handleSaveNewEntry} className="ml-auto">
+                      Save Entry
+                    </Button>
                   </div>
                 </div>
                 {newEntryCategory !== null && (
@@ -433,7 +432,7 @@ export function Journal() {
                       />
                     )}
                     <Textarea
-                      className="notebook-lines flex-1 resize-none h-[90%] rounded-none border-none px-2 py-0 text-base md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className="notebook-lines flex-1 resize-none h-[90%] rounded-none border-none px-2 py-0 text-base md:text-base leading-8 focus-visible:ring-0 focus-visible:ring-offset-0"
                       placeholder="Write your thoughts here..."
                       value={newEntryContent}
                       onChange={(e) => setNewEntryContent(e.target.value)}
@@ -536,12 +535,12 @@ export function Journal() {
                   <>
                     <div className="text-center mb-8">
                       {selectedCategory?.titleStyle !== "CUSTOM_TITLE" && (
-                        <div className="text-4xl font-bold mb-1">
+                        <div className="text-3xl font-bold mb-1">
                           Entry #{sortedEntries.length - currentCarouselIndex}
                         </div>
                       )}
                       {selectedCategory?.titleStyle !== "AUTO_NUMBER" && (
-                        <div className="text-4xl font-bold mb-1">
+                        <div className="text-3xl font-bold mb-1">
                           {
                             sortedEntries.find((e) => e.id === currentEntryId)!
                               .title
@@ -569,7 +568,7 @@ export function Journal() {
                         </div>
                       )}
                     </div>
-                    <div className="notebook-lines flex-1 px-2 text-base whitespace-pre-wrap">
+                    <div className="notebook-lines flex-1 px-2 text-base leading-8 whitespace-pre-wrap">
                       {
                         sortedEntries.find((e) => e.id === currentEntryId)!
                           .content
