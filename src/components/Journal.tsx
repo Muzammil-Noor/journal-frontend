@@ -10,7 +10,6 @@ import {
   Edit,
   Trash2,
   Book,
-  BookOpenText,
   Lock,
   NotebookPen,
   Earth,
@@ -297,12 +296,6 @@ export function Journal() {
           icon: Plus,
           active: currentView === "new",
         },
-        {
-          id: "index",
-          label: "Index",
-          icon: BookOpenText,
-          active: currentView !== "new",
-        },
       ],
     },
     {
@@ -336,8 +329,6 @@ export function Journal() {
   const handleSidebarNavigate = (id: string) => {
     if (id === "new") {
       handleNewEntry();
-    } else if (id === "index") {
-      handleIndexView();
     } else if (id === "lock") {
       handleLock();
     } else if (id.startsWith("category-")) {
@@ -365,7 +356,7 @@ export function Journal() {
       <main className="absolute z-1 bg-gradient-to-br from-stone-800 to-stone-900 flex-1 w-full h-dvh flex items-center justify-center p-6 md:pl-24">
         <div
           ref={entryPageRef}
-          className="w-full md:w-[50%] md:max-w-[900px] sm:min-w-[700px] h-[95vh] bg-white rounded-md shadow-lg relative mx-auto overflow-hidden"
+          className="font-journal w-full md:w-[50%] md:max-w-[900px] sm:min-w-[700px] h-[95vh] bg-white rounded-md shadow-lg relative mx-auto overflow-hidden"
           style={{
             boxShadow:
               "0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.07)",
@@ -381,9 +372,7 @@ export function Journal() {
             {currentView === "new" && (
               <div className="h-full flex flex-col">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-serif font-bold">
-                    New Journal Entry
-                  </h2>
+                  <h2 className="text-2xl font-bold">New Journal Entry</h2>
                   <div className="flex items-center gap-3">
                     <div className="flex gap-3 flex-col sm:flex-row w-[50%] sm:w-[100%]">
                       <Label
@@ -435,7 +424,7 @@ export function Journal() {
                   <div className="h-[100%]">
                     {newEntryCategory?.titleStyle !== "AUTO_NUMBER" && (
                       <Textarea
-                        className="border-none h-[10%] focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-xl font-serif"
+                        className="border-none h-[10%] focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-xl md:text-xl font-semibold"
                         placeholder="A Title for this entry"
                         value={newEntryTitle}
                         onChange={(e) => {
@@ -444,7 +433,7 @@ export function Journal() {
                       />
                     )}
                     <Textarea
-                      className="flex-1 resize-none h-[90%] p-4 text-lg font-serif border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className="notebook-lines flex-1 resize-none h-[90%] rounded-none border-none px-2 py-0 text-base md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
                       placeholder="Write your thoughts here..."
                       value={newEntryContent}
                       onChange={(e) => setNewEntryContent(e.target.value)}
@@ -580,7 +569,7 @@ export function Journal() {
                         </div>
                       )}
                     </div>
-                    <div className="flex-1 font-serif text-lg leading-relaxed whitespace-pre-wrap">
+                    <div className="notebook-lines flex-1 px-2 text-base whitespace-pre-wrap">
                       {
                         sortedEntries.find((e) => e.id === currentEntryId)!
                           .content

@@ -1,7 +1,15 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/600.css";
+@import "@fontsource/jetbrains-mono/700.css";
 
 @custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-journal: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
 
 @utility scrollbar-hide {
   -ms-overflow-style: none;
@@ -9,6 +17,21 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* Ruled notebook paper: a 2rem line grid that fills the element and scrolls
+   with its content. Text inside must keep line-height at 2rem (set here) and
+   the element's top padding must be a multiple of 2rem to stay on the lines. */
+@utility notebook-lines {
+  line-height: 2rem;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(2rem - 1px),
+    rgb(147 197 253 / 45%) calc(2rem - 1px),
+    rgb(147 197 253 / 45%) 2rem
+  );
+  background-attachment: local;
 }
 
 body{
