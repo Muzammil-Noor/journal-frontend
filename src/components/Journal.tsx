@@ -356,7 +356,7 @@ export function Journal() {
       <main className="absolute z-1 bg-gradient-to-br from-stone-800 to-stone-900 flex-1 w-full h-dvh flex items-center justify-center p-6 md:pl-24">
         <div
           ref={entryPageRef}
-          className="font-journal h-[95vh] aspect-[9/16] w-auto max-w-full bg-white rounded-md shadow-lg relative mx-auto overflow-hidden"
+          className="font-journal h-[95vh] aspect-[11/16] w-auto max-w-full bg-white rounded-md shadow-lg relative mx-auto overflow-hidden"
           style={{
             boxShadow:
               "0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.07)",

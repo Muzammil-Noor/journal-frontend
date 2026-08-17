@@ -21,15 +21,19 @@
 
 /* Ruled notebook paper: a 2rem line grid that fills the element and scrolls
    with its content. Text inside must keep line-height at 2rem (set here) and
-   the element's top padding must be a multiple of 2rem to stay on the lines. */
+   the element's top padding must be a multiple of 2rem to stay on the lines.
+   The rule sits at 1.5rem within each 2rem row — right under the text
+   baseline, so descenders (g, y, j) dip below it like on real paper. */
 @utility notebook-lines {
   line-height: 2rem;
   background-image: repeating-linear-gradient(
     to bottom,
     transparent 0,
-    transparent calc(2rem - 1px),
-    rgb(147 197 253 / 45%) calc(2rem - 1px),
-    rgb(147 197 253 / 45%) 2rem
+    transparent calc(1.5rem - 1px),
+    rgb(107 114 128 / 40%) calc(1.5rem - 1px),
+    rgb(107 114 128 / 40%) 1.5rem,
+    transparent 1.5rem,
+    transparent 2rem
   );
   background-attachment: local;
 }
